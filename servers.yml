@@ -32,8 +32,8 @@ Resources:
                 Fn::ImportValue: !Sub "${EnvironmentName}-VPCID"
             SecurityGroupIngress:
                 - IpProtocol: tcp
-                  FromPort: 8080
-                  ToPort: 8080
+                  FromPort: 80
+                  ToPort: 80
                   CidrIp: 0.0.0.0/0
                 - IpProtocol: tcp
                   FromPort: 22
@@ -57,7 +57,6 @@ Resources:
                     cd /var/www/html
                     echo "it works! Udagram, Udacity" > index.html
             ImageId: ami-0149b2da6ceec4bb0
-            KeyName: udagram_keypair
             SecurityGroups:
                 - Ref: WebServerSecGroup
             InstanceType: t3.medium
@@ -119,9 +118,16 @@ Resources:
             HealthCheckProtocol: HTTP
             HealthCheckTimeoutSeconds: 8
             HealthyThresholdCount: 2
-            Port: 8080
+            Port: 80
             Protocol: HTTP
             UnhealthyThresholdCount: 5
             VpcId:
                 Fn::ImportValue:
                     Fn::Sub: "${EnvironmentName}-VPCID"
+
+Outputs:
+
+    WebAppLoadBalancerDNSName:
+        Description: Load balancer public
+        Value:
+            Fn::Join: ["", ["http://", !GetAtt WebAppLB.DNSName]]
